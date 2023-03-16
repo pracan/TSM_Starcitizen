@@ -1,0 +1,71 @@
+{
+  "ArcCorp": {
+    "Jump": {
+      "OM-1": [null],
+      "OM-2": null,
+      "OM-3": null,
+      "OM-4": null,
+      "OM-5": null,
+      "OM-6": null
+    },
+    "Space": {
+      "Baijin Point": null,
+      "Comm Array ST3-90": null
+    },
+    "Self": {
+      "Area18": null,
+      "Area04": null,
+      "Area06": null,
+      "Area11": null,
+      "Area17": null,
+      "Area20": null
+    }
+  },
+  "Lyria": {
+    ".space": {
+      "Comm Array ST3-18": null
+    },
+    ".no_qt": {
+      "Paradise Cove": {
+        "Teddy's Playhouse": null
+      }
+    },
+    "Shubin Mining Facility SAL-2": null,
+    "Shubin Mining Facility SAL-5": null,
+    "Loveridge Mineral Reserve": null,
+    "Humboldt Mines": null,
+    "The Orphanage": null,
+    "The Pit": null,
+    "Wheeler's": null,
+    "Security Depot Lyria-1": null,
+    "Teddy's Playhouse": null,
+    "Shubin Processing Facility SPAL-3": null,
+    "Shubin Processing Facility SPAL-7": null,
+    "Shubin Processing Facility SPAL-9": null,
+    "Shubin Processing Facility SPAL-12": null,
+    "Shubin Processing Facility SPAL-16": null,
+    "Shubin Processing Facility SPAL-21": null,
+    "Elsewhere": null,
+    "Launch Pad": null,
+    "Buckets": null
+  },
+  "Wala": {
+    ".space": {
+      "Comm Array ST3-35": null
+    },
+    ".no_qt": {
+      "Good Times Temple": {
+        "Shady Glen Farms": null
+      }
+    },
+    "ArcCorp Mining Area 045": null,
+    "ArcCorp Mining Area 048": null,
+    "ArcCorp Mining Area 056": null,
+    "ArcCorp Mining Area 061": null,
+    "ArcCorp Processing Center 115": null,
+    "ArcCorp Processing Center 123": null,
+    "Lost and Found": null,
+    "Samson & Sons Salvage Center": null,
+    "Shady Glen Farms": null
+  }
+}
