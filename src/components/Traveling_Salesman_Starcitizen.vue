@@ -145,18 +145,21 @@ onMounted(() => {
         break;
       case 'ArcCorp':
         graph.setNodeAttribute(node, 'color', '#00cc66');
-        graph.setNodeAttribute(node, 'label', node.name);
+        //graph.setNodeAttribute(node, 'label', node.name);
+        graph.setNodeAttribute(node, 'size', '15');
         console.log('True : ArcCorp');
         break;
       case 'Lyria':
         graph.setNodeAttribute(node, 'color', '#cc0066');
-        graph.setNodeAttribute(node, 'label', node.name);
+        //graph.setNodeAttribute(node, 'label', node.name);
+        graph.setNodeAttribute(node, 'size', '10');
         console.log('True : Lyria');
         break;
       case 'Wala':
         graph.setNodeAttribute(node, 'color', '#9900cc');
-        graph.setNodeAttribute(node, 'label', node.name);
+        //graph.setNodeAttribute(node, 'label', node.name);
         console.log('True : Wala');
+        graph.setNodeAttribute(node, 'size', '10');
         break;
       default:
         graph.setNodeAttribute(node, 'color', '#cccccc');
@@ -200,7 +203,7 @@ onUnmounted(() => {
 
 function transformData(data) {
   const nodes = [];
-  const edges = [];
+  let edges = [];
   let count = 0;
 
   // Créer les noeuds à partir des données de l'API
@@ -224,7 +227,67 @@ function transformData(data) {
     }
   }
 
+  function addJumpEdges(nodes, edges) {
+    const arcCorpNode = nodes.find(
+      (node) => node.attributes.label === 'ArcCorp'
+    );
+    console.log('arcCorpNode :', arcCorpNode);
+    console.log('arcCorpNode.atr.parent :', arcCorpNode.attributes.parent);
+    const arcCorpChildrenLabels = edges
+      .filter((edge) => edge.source === arcCorpNode.key)
+      .map(
+        (edge) =>
+          nodes.find((node) => node.key === edge.target).attributes.label
+      );
+    console.log('arcCorpChildrenLabels :', arcCorpChildrenLabels);
+    const jumpNode = nodes.find(
+      (node) =>
+        node.attributes.parent ===
+        String(arcCorpNode.attributes.parent) + '.' + 'Jump'
+    );
+    console.log('jumpNode :', jumpNode);
+
+    if (jumpNode) {
+      const jumpNodeChildrenLabels = edges
+        .filter((edge) => edge.source === jumpNode.key)
+        .map(
+          (edge) =>
+            nodes.find((node) => node.key === edge.target).attributes.label
+        );
+      console.log('jumpNodeChildrenLabels :', jumpNodeChildrenLabels);
+
+      for (const jumpchild of jumpNodeChildrenLabels) {
+        console.log('jumpchild :', jumpchild);
+        const jumpchildNode = nodes.find(
+          (node) => node.attributes.label === jumpchild
+        );
+        console.log('jumpchildNode :', jumpchildNode);
+        for (const arcchild of arcCorpChildrenLabels) {
+          console.log('arcchild :', arcchild);
+          const arcchildNode = nodes.find(
+            (node) => node.attributes.label === arcchild
+          );
+          console.log('arcchildNode :', arcchildNode);
+          if (
+            arcchildNode.attributes.label !== 'Self' &&
+            arcchildNode.attributes.label !== 'Jump'
+          ) {
+            edges.push({
+              key: count++,
+              source: jumpchildNode.key,
+              target: arcchildNode.key,
+            });
+          }
+        }
+      }
+    }
+    return { edges };
+  }
+
   createNodes(data, null);
+  console.log(edges);
+  edges = addJumpEdges(nodes, edges).edges;
+  console.log(edges);
 
   return { nodes, edges };
 }
