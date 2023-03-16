@@ -284,6 +284,71 @@ function transformData(data) {
     }
   }
 
+  //WARNING if 2 space objects are too close to eachothers this will create dupes
+  function addSpaceObjQt_point(obj, parent) {
+    const results = [];
+
+    function findSpaceObj(obj, parent) {
+      if (obj.children) {
+        for (const child of obj.children) {
+          findSpaceObj(child, parent ? `${parent}.${obj.name}` : obj.name);
+        }
+      } else if (obj.qt_point) {
+        console.log('Space : obj :', obj);
+        results.push(obj);
+      }
+    }
+
+    function removeDupes() {
+      //please code me
+    }
+
+    findSpaceObj(obj, parent);
+    console.log('results :', results);
+    removeDupes();
+    for (const openresult of results) {
+      console.log('openresult :', openresult);
+      const spaceObjNode = nodes.find(
+        (node) => node.attributes.label === openresult.name
+      );
+      console.log('spaceObjNode :', spaceObjNode);
+      let temp_id = String(`${spaceObjNode.id}`);
+      let temp_charcount = String(`${spaceObjNode.label}`);
+      console.log('temp_id 1:', temp_id);
+      console.log('temp_charcount :', temp_charcount);
+      console.log('temp_charcount.length :', temp_charcount.length);
+      let temp_parent =
+        temp_id.slice(0, -1 * parseInt(temp_charcount.length + 1) - 6) +
+        '.' +
+        'OM' +
+        '.';
+      console.log('temp_id 2:', temp_parent);
+      for (const qpoint of openresult.qt_point) {
+        console.log('qpoint :', qpoint);
+        let realparent = temp_parent + qpoint.name;
+        console.log('realparent :', realparent);
+        const reachableSpaceObjNode = nodes.find(
+          (node) => node.attributes.parent === realparent
+        );
+        console.log('reachableSpaceObjNode :', reachableSpaceObjNode);
+        edges.push(
+          {
+            key: count++,
+            source: spaceObjNode.key,
+            target: reachableSpaceObjNode.key,
+          },
+          {
+            key: count++,
+            source: reachableSpaceObjNode.key,
+            target: spaceObjNode.key,
+          }
+        );
+      }
+    }
+
+    return results;
+  }
+
   // function addJumpEdges(nodes, edges) {
   //   const arcCorpNode = nodes.find(
   //     (node) => node.attributes.label === 'ArcCorp'
@@ -456,12 +521,15 @@ function transformData(data) {
   }
 
   createNodes(data, null);
+  addSpaceObjQt_point(data, null);
   // console.log(edges);
   edges = addOMJumpEdges(nodes, edges).edges;
   console.log('nodes :', nodes);
   // console.log('edges :', edges);
   edges = addOMSelfEdges(nodes, edges).edges;
   console.log('edges :', edges);
+
+  console.log(JSON.stringify({ nodes, edges }));
 
   return { nodes, edges };
 }
