@@ -32,7 +32,7 @@ const jsonData = {
       ],
     },
     {
-      name: 'Space',
+      name: 'space',
       children: [
         {
           name: 'Baijin Point',
@@ -294,7 +294,7 @@ function transformData(data) {
           findSpaceObj(child, parent ? `${parent}.${obj.name}` : obj.name);
         }
       } else if (obj.qt_point) {
-        console.log('Space : obj :', obj);
+        // console.log('Space : obj :', obj);
         results.push(obj);
       }
     }
@@ -304,19 +304,19 @@ function transformData(data) {
     }
 
     findSpaceObj(obj, parent);
-    console.log('results :', results);
+    // console.log('results :', results);
     removeDupes();
     for (const openresult of results) {
-      console.log('openresult :', openresult);
+      // console.log('openresult :', openresult);
       const spaceObjNode = nodes.find(
         (node) => node.attributes.label === openresult.name
       );
-      console.log('spaceObjNode :', spaceObjNode);
+      // console.log('spaceObjNode :', spaceObjNode);
       let temp_id = String(`${spaceObjNode.id}`);
       let temp_charcount = String(`${spaceObjNode.label}`);
-      console.log('temp_id 1:', temp_id);
-      console.log('temp_charcount :', temp_charcount);
-      console.log('temp_charcount.length :', temp_charcount.length);
+      // console.log('temp_id 1:', temp_id);
+      // console.log('temp_charcount :', temp_charcount);
+      // console.log('temp_charcount.length :', temp_charcount.length);
       let temp_parent =
         temp_id.slice(0, -1 * parseInt(temp_charcount.length + 1) - 6) +
         '.' +
@@ -324,13 +324,13 @@ function transformData(data) {
         '.';
       console.log('temp_id 2:', temp_parent);
       for (const qpoint of openresult.qt_point) {
-        console.log('qpoint :', qpoint);
+        // console.log('qpoint :', qpoint);
         let realparent = temp_parent + qpoint.name;
-        console.log('realparent :', realparent);
+        // console.log('realparent :', realparent);
         const reachableSpaceObjNode = nodes.find(
           (node) => node.attributes.parent === realparent
         );
-        console.log('reachableSpaceObjNode :', reachableSpaceObjNode);
+        // console.log('reachableSpaceObjNode :', reachableSpaceObjNode);
         edges.push(
           {
             key: count++,
@@ -419,13 +419,21 @@ function transformData(data) {
             nodes.find((node) => node.key === edge.target).attributes.label
         );
       // console.log('planetChildrenLabels :', planetChildrenLabels);
-
-      const jumpNode = nodes.find(
+      const omNode = nodes.find(
         (node) =>
           node.attributes.parent === `${planet.attributes.parent}` + `.` + `OM`
       );
-      // console.log('jumpNode :', jumpNode);
-      if (jumpNode) {
+      console.log('omNode :', omNode);
+      const spaceNode = nodes.find(
+        (node) =>
+          node.attributes.parent ===
+          `${planet.attributes.parent}` + `.` + `space`
+      );
+      console.log('spaceNode :', spaceNode);
+      const reachableNodes = [];
+      reachableNodes.push(omNode);
+      reachableNodes.push(spaceNode);
+      for (const jumpNode of reachableNodes) {
         const jumpNodeChildrenLabels = edges
           .filter((edge) => edge.source === jumpNode.key)
           .map(
@@ -447,7 +455,7 @@ function transformData(data) {
             // console.log('planetChildNode :', planetChildNode);
             if (
               planetChildNode.attributes.label !== 'Self' &&
-              planetChildNode.attributes.label !== 'Space' &&
+              planetChildNode.attributes.label !== 'space' &&
               planetChildNode.attributes.label !== 'OM'
             ) {
               edges.push(
@@ -529,7 +537,7 @@ function transformData(data) {
   edges = addOMSelfEdges(nodes, edges).edges;
   console.log('edges :', edges);
 
-  console.log(JSON.stringify({ nodes, edges }));
+  //console.log(JSON.stringify({ nodes, edges }));
 
   return { nodes, edges };
 }
