@@ -2,6 +2,7 @@
 import HelloWorld from './components/HelloWorld.vue';
 import TSS from './components/Traveling_Salesman_Starcitizen.vue';
 import data_writing from './components/data_writing.vue';
+import TSM_Trigo from './components/TSM_trigo.vue';
 </script>
 
 <template>
@@ -15,6 +16,7 @@ import data_writing from './components/data_writing.vue';
   </div>
   <!-- <HelloWorld msg="Vite + Vue" /> -->
   <!-- <data_writing /> -->
+  <TSM_Trigo />
   <TSS />
 </template>
 
