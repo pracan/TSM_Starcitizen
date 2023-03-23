@@ -3,6 +3,7 @@ import HelloWorld from './components/HelloWorld.vue';
 import TSS from './components/Traveling_Salesman_Starcitizen.vue';
 import data_writing from './components/data_writing.vue';
 import TSM_Trigo from './components/TSM_trigo.vue';
+import cards_traject from './components/cards_traject.vue';
 </script>
 
 <template>
@@ -18,6 +19,7 @@ import TSM_Trigo from './components/TSM_trigo.vue';
   <!-- <data_writing /> -->
   <TSM_Trigo />
   <TSS />
+  <cards_traject />
 </template>
 
 <style scoped>

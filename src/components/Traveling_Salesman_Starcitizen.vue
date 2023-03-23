@@ -550,6 +550,7 @@ function transformData(data) {
   height: 90vh;
   border: 1px solid #e8e8e8;
   border-radius: 8px;
+  text-align: left;
 }
 button + button {
   margin-left: 10px;
