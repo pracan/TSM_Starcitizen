@@ -29,6 +29,10 @@ class Vecteur {
     return new Vecteur(new Point(0, 0, 0), new Point(x, y, z));
   }
 
+  produitScalaire(vecteur) {
+    return this.x * vecteur.x + this.y * vecteur.y + this.z * vecteur.z;
+  }
+
   norm() {
     return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
   }
@@ -49,7 +53,7 @@ class Sphere {
   }
 }
 
-function distancePointDroite(A, B, C) {
+function distancePointSegment(A, B, C) {
   const v1 = new Vecteur(A, B);
   const v2 = new Vecteur(A, C);
   const produit = v2.produitVectoriel(v1);
@@ -57,7 +61,23 @@ function distancePointDroite(A, B, C) {
   if (norme === 0) {
     // Les points B et C sont alignés, on renvoie la distance entre C et A ou B
     //return Math.min(distancePoints(A, C), distancePoints(B, C));
-    //todo
+    const kac = v1.produitScalaire(v2);
+    const kab = v1.produitScalaire(v1);
+
+    if (kac < 0) {
+      return kac.norm(); //for the moment we don't know how to behave if the object is located behind us
+    }
+    if (kac > kab) {
+      return new Vecteur(B, C).norm();
+    } //l'objet est derrière
+    // (ne devrais pas pouvoir déclencher de distance <= sphere.rayon plus tard dans le code sinon erreur de logique)
+    if (kac == 0 || kac == kab) {
+      return -1;
+    } //error in maths (shouldn't be able to trigger)
+
+    if (kac > 0 && kac < kab) {
+      return 0; // la voie est obstruée par un objet
+    }
   }
   const normeAB = v1.norm();
   const distance = norme / normeAB;
@@ -65,7 +85,7 @@ function distancePointDroite(A, B, C) {
 }
 
 function segmentPasseParSphere(A, B, sphere) {
-  const distance = distancePointDroite(A, B, sphere.center);
+  const distance = distancePointSegment(A, B, sphere.center);
   return distance <= sphere.rayon;
 }
 
@@ -97,7 +117,7 @@ function spheresAccessibles(point, spheres) {
 const A = new Point(0, 0, 0);
 const B = new Point(1, 0, 0);
 const C = new Point(0, 1, 0);
-const distance = distancePointDroite(A, B, C);
+const distance = distancePointSegment(A, B, C);
 console.log(distance); // affiche 1
 
 const point = new Point(0, 0, 0);
