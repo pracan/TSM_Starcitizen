@@ -19,10 +19,15 @@
               {{ option }}
             </option>
           </select>
-          <button @click="deleteDropdown(card, dropdownIndex)">
-            Supprimer
+          <button
+            @click="deleteDropdown(card, dropdownIndex)"
+            class="cross-button"
+          >
+            <svg viewBox="0 0 10 10" width="16" height="16">
+              <line x1="2" y1="2" x2="8" y2="8" stroke-width="2" />
+              <line x1="2" y1="8" x2="8" y2="2" stroke-width="2" />
+            </svg>
           </button>
-          <svg src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
         </div>
         <div v-if="card.dropdowns.length < 4" :key="index" class="addbutton">
           <button @click="addDropdown(card)">
@@ -128,5 +133,24 @@ export default {
 
 .dropdown {
   margin-bottom: 10px;
+}
+
+.cross-button svg {
+  stroke: currentColor;
+  stroke-linecap: round;
+  transition: stroke 0.2s ease-in-out;
+}
+.cross-button:hover {
+  border-color: red;
+}
+.cross-button:hover svg {
+  stroke-width: 3;
+  border-color: red;
+  stroke: red;
+  transition: opacity 0.2s ease-in-out;
+}
+.cross-button:active svg {
+  stroke-width: 2;
+  stroke: red;
 }
 </style>
