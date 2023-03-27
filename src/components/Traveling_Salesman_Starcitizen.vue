@@ -301,6 +301,7 @@ function transformData(data) {
 
     function removeDupes() {
       //please code me
+      //problem is linked to the bidirectional edges
     }
 
     findSpaceObj(obj, parent);
@@ -528,6 +529,44 @@ function transformData(data) {
     return { edges };
   }
 
+  function addNoQTEdges(obj, nodes, edges) {
+    const results = [];
+    function findNoQTObj(obj, parent) {
+      if (obj.near) {
+        // console.log('Space : obj :', obj);
+        results.push(obj);
+      } else if (obj.children) {
+        for (const child of obj.children) {
+          findNoQTObj(child, parent ? `${parent}.${obj.name}` : obj.name);
+        }
+        return 1;
+      }
+    }
+
+    const dummy = findNoQTObj(obj, parent);
+    console.log('NoQTresults :', results);
+    for (const openresult of results) {
+      console.log('openresult :', openresult);
+      const spaceObjNode = nodes.find(
+        (node) => node.attributes.label === openresult.name
+      );
+    }
+
+    const NoQTParents = nodes.filter(
+      (node) => node.attributes.label === 'no_qt'
+    );
+    console.log('NoQTParents :', NoQTParents);
+    for (const NoQTParent of NoQTParents) {
+      const NoQTChildrenLabels = edges
+        .filter((edge) => edge.source === NoQTParent.key)
+        .map((edge) => nodes.find((node) => node.key === edge.target));
+
+      console.log('NoQTChildrenLabels :', NoQTChildrenLabels);
+    }
+
+    return { edges };
+  }
+
   createNodes(data, null);
   addSpaceObjQt_point(data, null);
   // console.log(edges);
@@ -536,6 +575,7 @@ function transformData(data) {
   // console.log('edges :', edges);
   edges = addOMSelfEdges(nodes, edges).edges;
   console.log('edges :', edges);
+  addNoQTEdges(data, nodes, edges);
 
   //console.log(JSON.stringify({ nodes, edges }));
 
