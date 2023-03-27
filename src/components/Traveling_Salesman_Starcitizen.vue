@@ -323,7 +323,7 @@ function transformData(data) {
         '.' +
         'OM' +
         '.';
-      console.log('temp_id 2:', temp_parent);
+      // console.log('temp_id 2:', temp_parent);
       for (const qpoint of openresult.qt_point) {
         // console.log('qpoint :', qpoint);
         let realparent = temp_parent + qpoint.name;
@@ -424,13 +424,13 @@ function transformData(data) {
         (node) =>
           node.attributes.parent === `${planet.attributes.parent}` + `.` + `OM`
       );
-      console.log('omNode :', omNode);
+      // console.log('omNode :', omNode);
       const spaceNode = nodes.find(
         (node) =>
           node.attributes.parent ===
           `${planet.attributes.parent}` + `.` + `space`
       );
-      console.log('spaceNode :', spaceNode);
+      // console.log('spaceNode :', spaceNode);
       const reachableNodes = [];
       reachableNodes.push(omNode);
       reachableNodes.push(spaceNode);
@@ -544,24 +544,71 @@ function transformData(data) {
     }
 
     const dummy = findNoQTObj(obj, parent);
-    console.log('NoQTresults :', results);
+    // console.log('NoQTresults :', results);
     for (const openresult of results) {
-      console.log('openresult :', openresult);
-      const spaceObjNode = nodes.find(
+      // console.log('openresult :', openresult);
+      const NoQTNode = nodes.find(
         (node) => node.attributes.label === openresult.name
       );
+      // console.log('NoQTNode :', NoQTNode);
+      for (const nearQTpoints of openresult.near) {
+        // console.log('nearQTpoints :', nearQTpoints);
+        const NearQTNode = nodes.find(
+          (node) => node.attributes.label === nearQTpoints.name
+        );
+        // console.log('NearQTNode :', NearQTNode);
+        edges.push({
+          key: count++,
+          source: NearQTNode.key,
+          target: NoQTNode.key,
+        });
+      }
     }
 
-    const NoQTParents = nodes.filter(
-      (node) => node.attributes.label === 'no_qt'
-    );
-    console.log('NoQTParents :', NoQTParents);
-    for (const NoQTParent of NoQTParents) {
-      const NoQTChildrenLabels = edges
-        .filter((edge) => edge.source === NoQTParent.key)
-        .map((edge) => nodes.find((node) => node.key === edge.target));
+    // const NoQTParents = nodes.filter(
+    //   (node) => node.attributes.label === 'no_qt'
+    // );
+    // console.log('NoQTParents :', NoQTParents);
+    // for (const NoQTParent of NoQTParents) {
+    //   const NoQTChildrenLabels = edges
+    //     .filter((edge) => edge.source === NoQTParent.key)
+    //     .map((edge) => nodes.find((node) => node.key === edge.target));
 
-      console.log('NoQTChildrenLabels :', NoQTChildrenLabels);
+    //   console.log('NoQTChildrenLabels :', NoQTChildrenLabels);
+    // }
+
+    return { edges };
+  }
+
+  function planetRmvDotselfNode(nodes, edges) {
+    const planets = nodes.filter(
+      (node) => node.attributes.sc_type === 'Planet'
+    );
+    console.log('planets :', planets);
+    for (const planet of planets) {
+      console.log('planet :', planet);
+      const planetSelfNode = edges
+        .filter((edge) => edge.source === planet.key)
+        .map((edge) => nodes.find((node) => node.key === edge.target))
+        .filter((node) => node.label == 'Self')[0];
+      console.log('planetSelfNode :', planetSelfNode);
+
+      const planetSelfNodeInEdges = edges.filter(
+        (edge) => edge.target === planetSelfNode.key
+      );
+      for (const inEdge of planetSelfNodeInEdges) {
+        //remove
+      }
+      console.log('planetSelfNodeInEdges :', planetSelfNodeInEdges);
+      const planetSelfNodeOutEdges = edges.filter(
+        (edge) => edge.source === planetSelfNode.key
+      );
+      for (const inEdge of planetSelfNodeOutEdges) {
+        console.log('inEdge before:', inEdge);
+        inEdge.source = planet.key;
+        console.log('inEdge after:', inEdge);
+      }
+      console.log('planetSelfNodeOutEdges :', planetSelfNodeOutEdges);
     }
 
     return { edges };
@@ -576,6 +623,7 @@ function transformData(data) {
   edges = addOMSelfEdges(nodes, edges).edges;
   console.log('edges :', edges);
   addNoQTEdges(data, nodes, edges);
+  planetRmvDotselfNode(nodes, edges);
 
   //console.log(JSON.stringify({ nodes, edges }));
 
@@ -588,6 +636,7 @@ function transformData(data) {
 #sigma-container {
   position: relative;
   height: 90vh;
+  width: 90vw;
   border: 1px solid #e8e8e8;
   border-radius: 8px;
   text-align: left;
