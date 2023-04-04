@@ -195,6 +195,12 @@ onMounted(() => {
         graph.setNodeAttribute(node, 'color', '#0066cc');
         // console.log('True : space');
         break;
+      case 'Self':
+        graph.setNodeAttribute(node, 'color', '#cc66cc');
+        break;
+      case 'OM':
+        graph.setNodeAttribute(node, 'color', '#cc6600');
+        break;
       case 'no_qt':
         graph.setNodeAttribute(node, 'color', '#ff9900');
         // console.log('True : no_qt');
@@ -280,6 +286,22 @@ function transformData(data) {
       for (const child of obj.children) {
         edges.push({ key: count++, source: node.key, target: count });
         createNodes(child, node.id);
+      }
+    }
+  }
+
+  function RmvNode(nodeId, nodes, edges) {
+    // Remove the node from the nodes array
+    const nodeIndex = nodes.findIndex((node) => node.key === nodeId);
+    if (nodeIndex !== -1) {
+      nodes.splice(nodeIndex, 1);
+    }
+
+    // Remove any edges that reference the node from the edges array
+    for (let i = edges.length - 1; i >= 0; i--) {
+      const edge = edges[i];
+      if (edge.source === nodeId || edge.target === nodeId) {
+        edges.splice(i, 1);
       }
     }
   }
@@ -464,17 +486,19 @@ function transformData(data) {
                   key: count++,
                   source: jumpchildNode.key,
                   target: planetChildNode.key,
-                },
-                {
-                  key: count++,
-                  source: planetChildNode.key,
-                  target: jumpchildNode.key,
                 }
+                // ,{
+                //   key: count++,
+                //   source: planetChildNode.key,
+                //   target: jumpchildNode.key,
+                // }
               );
             }
           }
         }
       }
+      //remove space node
+      //remove om node
     }
 
     return { edges };
@@ -523,6 +547,9 @@ function transformData(data) {
             });
           }
         }
+        //add link from planet
+        //add link to visible ground destination
+        //add link to other planets
       }
     }
 
@@ -550,7 +577,7 @@ function transformData(data) {
       const NoQTNode = nodes.find(
         (node) => node.attributes.label === openresult.name
       );
-      // console.log('NoQTNode :', NoQTNode);
+      //console.log('NoQTNode :', NoQTNode);
       for (const nearQTpoints of openresult.near) {
         // console.log('nearQTpoints :', nearQTpoints);
         const NearQTNode = nodes.find(
@@ -564,18 +591,19 @@ function transformData(data) {
         });
       }
     }
+    const NoQTParents = nodes.filter(
+      (node) => node.attributes.label === 'no_qt'
+    );
 
-    // const NoQTParents = nodes.filter(
-    //   (node) => node.attributes.label === 'no_qt'
-    // );
-    // console.log('NoQTParents :', NoQTParents);
-    // for (const NoQTParent of NoQTParents) {
+    //console.log('NoQTParents :', NoQTParents);
+    for (const NoQTParent of NoQTParents) {
+      RmvNode(NoQTParent.key, nodes, edges);
+    }
     //   const NoQTChildrenLabels = edges
     //     .filter((edge) => edge.source === NoQTParent.key)
     //     .map((edge) => nodes.find((node) => node.key === edge.target));
 
     //   console.log('NoQTChildrenLabels :', NoQTChildrenLabels);
-    // }
 
     return { edges };
   }
@@ -584,34 +612,75 @@ function transformData(data) {
     const planets = nodes.filter(
       (node) => node.attributes.sc_type === 'Planet'
     );
-    console.log('planets :', planets);
+    //console.log('planets :', planets);
     for (const planet of planets) {
-      console.log('planet :', planet);
+      //console.log('planet :', planet);
       const planetSelfNode = edges
         .filter((edge) => edge.source === planet.key)
         .map((edge) => nodes.find((node) => node.key === edge.target))
         .filter((node) => node.label == 'Self')[0];
-      console.log('planetSelfNode :', planetSelfNode);
+      //console.log('planetSelfNode :', planetSelfNode);
 
       const planetSelfNodeInEdges = edges.filter(
         (edge) => edge.target === planetSelfNode.key
       );
-      for (const inEdge of planetSelfNodeInEdges) {
-        //remove
-      }
-      console.log('planetSelfNodeInEdges :', planetSelfNodeInEdges);
+      //console.log('planetSelfNodeInEdges :', planetSelfNodeInEdges);
       const planetSelfNodeOutEdges = edges.filter(
         (edge) => edge.source === planetSelfNode.key
       );
       for (const inEdge of planetSelfNodeOutEdges) {
-        console.log('inEdge before:', inEdge);
+        //console.log('inEdge before:', inEdge);
         inEdge.source = planet.key;
-        console.log('inEdge after:', inEdge);
+        //console.log('inEdge after:', inEdge);
       }
-      console.log('planetSelfNodeOutEdges :', planetSelfNodeOutEdges);
+      //console.log('planetSelfNodeOutEdges :', planetSelfNodeOutEdges);
+
+      RmvNode(planetSelfNode.key, nodes, edges);
     }
 
-    return { edges };
+    return edges;
+  }
+
+  function planetRmvSpaceandOMNode(nodes, edges) {
+    const planets = nodes.filter(
+      (node) =>
+        node.attributes.sc_type === 'Planet' ||
+        node.attributes.sc_type === 'Moon'
+    );
+    //console.log('planets :', planets);
+    for (const planet of planets) {
+      //console.log('planet :', planet);
+      const NodesToRemove = edges
+        .filter((edge) => edge.source === planet.key)
+        .map((edge) => nodes.find((node) => node.key === edge.target))
+        .filter((node) => node.label == 'space' || node.label == 'OM');
+
+      console.log('NodesToRemove :', NodesToRemove);
+      for (const planetSelfNode of NodesToRemove) {
+        const planetSelfNodeInEdges = edges.filter(
+          (edge) => edge.target === planetSelfNode.key
+        );
+        // for (const outEdge of planetSelfNodeInEdges) {
+        //   //console.log('inEdge before:', inEdge);
+        //   inEdge.target = planet.key;
+        //   //console.log('inEdge after:', inEdge);
+        // }
+        //console.log('planetSelfNodeInEdges :', planetSelfNodeInEdges);
+        const planetSelfNodeOutEdges = edges.filter(
+          (edge) => edge.source === planetSelfNode.key
+        );
+        for (const inEdge of planetSelfNodeOutEdges) {
+          //console.log('inEdge before:', inEdge);
+          inEdge.source = planet.key;
+          //console.log('inEdge after:', inEdge);
+        }
+        //console.log('planetSelfNodeOutEdges :', planetSelfNodeOutEdges);
+
+        RmvNode(planetSelfNode.key, nodes, edges);
+      }
+    }
+
+    return edges;
   }
 
   createNodes(data, null);
@@ -624,8 +693,7 @@ function transformData(data) {
   console.log('edges :', edges);
   addNoQTEdges(data, nodes, edges);
   planetRmvDotselfNode(nodes, edges);
-
-  //console.log(JSON.stringify({ nodes, edges }));
+  planetRmvSpaceandOMNode(nodes, edges);
 
   return { nodes, edges };
 }
@@ -635,8 +703,9 @@ function transformData(data) {
 <style scoped>
 #sigma-container {
   position: relative;
+  margin: auto;
   height: 90vh;
-  width: 90vw;
+  width: 50vw;
   border: 1px solid #e8e8e8;
   border-radius: 8px;
   text-align: left;
